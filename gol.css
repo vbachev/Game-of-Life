@@ -7,8 +7,26 @@ body{
 	margin: 0 auto;
 }
 
+.configuration{
+	float:left;
+	width: 25%;
+}
+.configuration div{
+	margin: 0 0 20px;
+}
+
+.stageWrapper{
+	float: left;
+	width: 65%;
+	margin-left: 5%;
+}
+
 .dashboard{
-	margin: 0 10px;
+	margin: 10px 0 0;
+	display: block;
+}
+.dashboard.running{
+	color: green;
 }
 
 .stage ul{

@@ -1,17 +1,36 @@
-var ticker;
-var generation = 0;
+var ticker,
+	handbrake,
+	speed,
+	cells,
+	nextGenerationCells,
+	generation,
+	gridSize = 40;
 
-var cells = [];
-var nextGenerationCells;
+var gameSpeeds = {
+	slow : {
+		name : 'Slow',
+		time : 500
+	},
+	medium : {
+		name : 'Normal',
+		time : 200
+	},
+	fast : {
+		name : 'Fast',
+		time : 50
+	}
+};
 
-var gridSize = 60;
-var speed    = 200;
-
-var handbrake = false;
-
-// var initialLiveItems = [[4,4],[4,3],[3,4],[3,3]];
-// var initialLiveItems = [[4,4],[4,3],[4,5]];
-var initialLiveItems = [[0,1],[1,0],[1,1],[1,2],[2,0]];
+var cellFormations = {
+	pentonimo : {
+		name  : 'The R-pentonimo',
+		cells : [[0,1],[1,0],[1,1],[1,2],[2,0]]
+	},
+	dieHard : {
+		name  : 'Die hard',
+		cells : [[0,1],[1,1],[1,2],[5,2],[6,2],[7,2],[6,0]]
+	}
+};
 
 function tick()
 {
@@ -20,25 +39,42 @@ function tick()
 		return;
 	}
 
-	getNewState();
+	calculateNextGeneration();
 	cells = nextGenerationCells;
-	liveCells = drawState();
+	liveCellsCount = drawState();
 
 	generation++;
 
-	updateDashboard( generation, liveCells );
+	updateDashboard( generation, liveCellsCount );
 }
 
-function startTimer()
+function startTicker()
 {
 	clearInterval( ticker );
 	handbrake = false;
 	ticker = setInterval( 'tick();', speed );
 }
 
-function stopTimer()
+function stopTicker()
 {
 	handbrake = true;
+}
+
+function toggleGame ( a_state )
+{
+	if( a_state === undefined ){
+		var a_state = handbrake;
+	}
+
+	if( a_state ){
+		startTicker();
+		$('#toggleGame').text('Pause');
+		$('.dashboard').addClass('running');
+	} else {
+		stopTicker();
+		$('#toggleGame').text('Start');
+		$('.dashboard').removeClass('running');
+	}
 }
 
 function setStage()
@@ -48,6 +84,7 @@ function setStage()
 		j, 
 		className;
 
+	cells = [];
 	for( i = 0; i < gridSize; i++ )
 	{
 		cells[i] = [];
@@ -128,7 +165,7 @@ function countLiveNeighbours( a_x, a_y )
 	return liveNeighbours;
 }
 
-function getNewState()
+function calculateNextGeneration()
 {
 	var neighbours,
 		willLive,
@@ -167,7 +204,7 @@ function drawState()
 		liveCells = 0,
 		i, j;
 
-	$( '.stage li.on' ).removeClass('on');
+	killAllCells();
 
 	for( i = 0; i < gridSize; i++ )
 	{
@@ -184,22 +221,63 @@ function drawState()
 	return liveCells;
 }
 
+function killAllCells () 
+{
+	$( '.stage li.on' ).removeClass('on');
+}
+
 function setItemsAlive( a_items )
 {
 	for( i in a_items ){
 		currentItem = a_items[i];
-		cells[ currentItem[0] + gridSize/2 ][ currentItem[1] + gridSize/2 ].alive = true;
+		cells[ currentItem[0] + parseInt(gridSize/2) ][ currentItem[1] + parseInt(gridSize/2) ].alive = true;
 	}
 }
 
 function updateDashboard( a_generation, a_count )
 {
+	if( !a_count ){
+		alert('All cells have died. Game over!');
+		toggleGame(false);
+	}
+
 	$('.dashboard').text('Generation: '+a_generation+'; Cells: '+a_count);
+}
+
+function applyConfiguration ()
+{
+	var selectedSpeed = gameSpeeds[ $('#gameSpeed').val() ].time,
+		cellFormation = cellFormations[ $('#cellFormation').val() ].cells;
+	
+	toggleGame(false);
+	
+	speed = selectedSpeed;
+	generation = 0;
+
+	setStage();
+	setItemsAlive( cellFormation );
+	drawState();
+}
+
+function populateConfigurationPanel ()
+{
+	var cellFormationOptions = '',
+		gameSpeedOptions = '';
+
+	for( key in cellFormations ){
+		cellFormationOptions += '<option value="'+key+'">'+cellFormations[key].name+'</option>';
+	}
+
+	for( key in gameSpeeds ){
+		gameSpeedOptions += '<option value="'+key+'">'+gameSpeeds[key].name+'</option>';
+	}
+
+	$('#gameSpeed').html( gameSpeedOptions );
+	$('#cellFormation').html( cellFormationOptions );
 }
 
 $(document).ready(function()
 {
-	setStage();
-	setItemsAlive( initialLiveItems );
-	drawState();
+	populateConfigurationPanel();
+	applyConfiguration();
 });

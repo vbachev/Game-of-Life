@@ -15,12 +15,38 @@
 	<div class="wrapper">
 		<h1>My Game Of Life</h1>
 
-		<button onclick="stopTimer();">Stop</button>
-		<button onclick="startTimer();">Start</button>
+		<fieldset class="configuration">
+			<legend>Configuration</legend>
 
-		<label class="dashboard"></label>
+			<div>
+				<label for="">Game speed:</label>
+				<br>
+				<select name="gameSpeed" id="gameSpeed">
+					<option value="0">slow</option>
+					<option value="1">normal</option>
+					<option value="2">fast</option>
+				</select>
+			</div>
 
-		<div class="stage"></div>
+			<div>
+				<label for="">Cell formation:</label>
+				<br>
+				<select name="cellFormation" id="cellFormation">
+					<option value="0"></option>
+					<option value="1"></option>
+					<option value="2"></option>
+				</select>
+			</div>
+
+			<button onclick="applyConfiguration();">Apply &amp; Reset</button>
+			<button onclick="toggleGame();" id="toggleGame">Start</button>
+
+			<label class="dashboard"></label>
+		</fieldset>
+
+		<div class="stageWrapper">
+			<div class="stage"></div>
+		</div>
 	</div>
 </body>
 </html>
