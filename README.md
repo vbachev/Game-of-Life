@@ -1,0 +1,1 @@
+I recently read about a developer event (Code-retreat) that tries to hone people's programming skills while building Conway's Game of Life again and again. Thought it would be interesting to see if I can do it myslef in JS.
