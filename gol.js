@@ -1,3 +1,4 @@
+// global variables
 var ticker,
 	handbrake,
 	speed,
@@ -6,6 +7,7 @@ var ticker,
 	generation,
 	gridSize = 40;
 
+// possible speed levels
 var gameSpeeds = {
 	slow : {
 		name : 'Slow',
@@ -21,6 +23,7 @@ var gameSpeeds = {
 	}
 };
 
+// possible cell formations
 var cellFormations = {
 	pentonimo : {
 		name  : 'The R-pentonimo',
@@ -32,22 +35,24 @@ var cellFormations = {
 	}
 };
 
+// this is the heartbeat; the clock that makes it all work
 function tick()
 {
+	// stop the ticker and this function
 	if( handbrake ){
 		clearInterval( ticker );
 		return;
 	}
 
-	calculateNextGeneration();
-	cells = nextGenerationCells;
-	liveCellsCount = drawState();
+	calculateNextGeneration();		// get next generation cells
+	cells = nextGenerationCells;	// replace current cells with new ones
+	liveCellsCount = drawState();	// draw new generation on stage
 
 	generation++;
-
 	updateDashboard( generation, liveCellsCount );
 }
 
+// initializes the ticker and starts the game
 function startTicker()
 {
 	clearInterval( ticker );
@@ -55,11 +60,13 @@ function startTicker()
 	ticker = setInterval( 'tick();', speed );
 }
 
+// stops the game by putting a handbrake which will disable the ticker on its next iteration
 function stopTicker()
 {
 	handbrake = true;
 }
 
+// toggles the game on or off
 function toggleGame ( a_state )
 {
 	if( a_state === undefined ){
@@ -77,6 +84,7 @@ function toggleGame ( a_state )
 	}
 }
 
+// initially creates the stage HTML and cells array
 function setStage()
 {
 	var htmlContent = '<ul>', 
@@ -110,17 +118,20 @@ function setStage()
 	$('.stage').html( htmlContent );
 }
 
-function getItem( a_x, a_y )
+// returns a cell object
+function getCell( a_x, a_y )
 {
 	return cells[ a_x ][ a_y ];
 }
 
+// returns true or false for a given cell
 function isAlive( a_x, a_y )
 {
-	var item = getItem( a_x, a_y );
+	var item = getCell( a_x, a_y );
 	return item.alive;
 }
 
+// loops over a cell's neighbours and returns how many of them are alive
 function countLiveNeighbours( a_x, a_y )
 {
 	var xMin = a_x - 1,
@@ -131,13 +142,13 @@ function countLiveNeighbours( a_x, a_y )
 		liveNeighbours = 0,
 		i;
 
+	// if at edges of the stage
 	if( xMin == -1 ){
 		xMin = gridSize - 1;
 	}
 	if( xMax == gridSize ){
 		xMax = 0;
 	}
-
 	if( yMin == -1 ){
 		yMin = gridSize - 1;	
 	}
@@ -145,6 +156,7 @@ function countLiveNeighbours( a_x, a_y )
 		yMax = 0;
 	}
 
+	// build neighbours array
 	neighbours = [
 		[ xMin, yMin ],
 		[ a_x,  yMin ],
@@ -156,6 +168,7 @@ function countLiveNeighbours( a_x, a_y )
 		[ xMin, a_y  ]
 	];
 
+	// loop over neighbours
 	for( i in neighbours ){
 		if( isAlive( neighbours[i][0], neighbours[i][1] )){
 			liveNeighbours++;
@@ -165,6 +178,9 @@ function countLiveNeighbours( a_x, a_y )
 	return liveNeighbours;
 }
 
+// core Game of Life logic. 
+// loops over all cells and decides which will survive in the next generation. 
+// Populates the nextGenerationCells array
 function calculateNextGeneration()
 {
 	var neighbours,
@@ -179,7 +195,7 @@ function calculateNextGeneration()
 		nextGenerationCells[i] = [];
 		for( j = 0; j < gridSize; j++ )
 		{
-			oldObject = getItem( i, j );
+			oldObject = getCell( i, j );
 			neighbours = countLiveNeighbours( i, j ) >> 0;
 
 			if( oldObject.alive ){
@@ -198,19 +214,20 @@ function calculateNextGeneration()
 	}
 }
 
+// uses the cells array to "draw" living cells on the stage
 function drawState()
 {
 	var currentItem,
 		liveCells = 0,
 		i, j;
 
-	killAllCells();
+	$( '.stage li.on' ).removeClass('on');
 
 	for( i = 0; i < gridSize; i++ )
 	{
 		for( j = 0; j < gridSize; j++ )
 		{
-			currentItem = getItem( i, j );
+			currentItem = getCell( i, j );
 			if( currentItem.alive ){
 				$( '.item-' + i + '-' + j ).addClass('on');
 				liveCells++;
@@ -221,11 +238,8 @@ function drawState()
 	return liveCells;
 }
 
-function killAllCells () 
-{
-	$( '.stage li.on' ).removeClass('on');
-}
-
+// takes an array of cell coordinates ant turns them alive.
+// used to display a preset cell pattern
 function setItemsAlive( a_items )
 {
 	for( i in a_items ){
@@ -234,6 +248,7 @@ function setItemsAlive( a_items )
 	}
 }
 
+// updates a short string with generation and cell counter
 function updateDashboard( a_generation, a_count )
 {
 	if( !a_count ){
@@ -244,13 +259,15 @@ function updateDashboard( a_generation, a_count )
 	$('.dashboard').text('Generation: '+a_generation+'; Cells: '+a_count);
 }
 
+// takes the selected options from the configuration and applies them to the game
+// resets the stage and cells array
 function applyConfiguration ()
 {
 	var selectedSpeed = gameSpeeds[ $('#gameSpeed').val() ].time,
 		cellFormation = cellFormations[ $('#cellFormation').val() ].cells;
 	
 	toggleGame(false);
-	
+
 	speed = selectedSpeed;
 	generation = 0;
 
@@ -259,6 +276,7 @@ function applyConfiguration ()
 	drawState();
 }
 
+// uses the formation and speed objects to populate options in the configuration panel
 function populateConfigurationPanel ()
 {
 	var cellFormationOptions = '',
