@@ -44,13 +44,19 @@ function tick()
 		return;
 	}
 
+	
 	calculateNextGeneration();		// get next generation cells
+	var t1 = new Date();
 	cells = nextGenerationCells;	// replace current cells with new ones
 	liveCellsCount = drawState();	// draw new generation on stage
 
+	var t2 = new Date();
+	var elapsed = t2 - t1;
+
 	// display text feedback
 	generation++;
-	updateDashboard( generation, liveCellsCount );
+	updateDashboard( generation, liveCellsCount, elapsed );
+
 }
 
 // initializes the ticker and starts the game
@@ -107,12 +113,7 @@ function setStage()
 
 			htmlContent += '<li id="' + i + '-' + j + '" class="' + className + '" title="[' + i + ':' + j + ']"></li>';
 			
-			itemObject = {
-				x		 : i,
-				y		 : j,
-				alive 	 : false
-			}
-			cells[i][j] = itemObject;
+			cells[i][j] = false;
 		}
 	}
 
@@ -127,11 +128,11 @@ function getCell( a_x, a_y )
 }
 
 // returns true or false for a given cell
-function isAlive( a_x, a_y )
+/*function isAlive( a_x, a_y )
 {
 	var item = getCell( a_x, a_y );
-	return item.alive;
-}
+	return item;
+}*/
 
 // loops over a cell's neighbours and returns how many of them are alive
 function countLiveNeighbours( a_x, a_y )
@@ -173,7 +174,7 @@ function countLiveNeighbours( a_x, a_y )
 
 	// loop over neighbours
 	for( i in neighbours ){
-		if( isAlive( neighbours[i][0], neighbours[i][1] )){
+		if( cells[ neighbours[i][0] ][ neighbours[i][1] ] ){
 			liveNeighbours++;
 		}
 	}
@@ -199,22 +200,17 @@ function calculateNextGeneration()
 		nextGenerationCells[i] = [];
 		for( j = 0; j < gridSize; j++ )
 		{
-			oldObject = getCell( i, j );
+			oldCell    = cells[i][j];
 			neighbours = countLiveNeighbours( i, j ) >> 0;
 
 			// survial logic for live and dead cells
-			if( oldObject.alive ){
+			if( oldCell ){
 				willLive = ( neighbours == 2 || neighbours == 3 ) ? true : false;
 			} else {
 				willLive = ( neighbours == 3 ) ? true : false;
 			}
 
-			newObject = {
-				x : i,
-				y : j,
-				alive : willLive
-			};
-			nextGenerationCells[i][j] = newObject;
+			nextGenerationCells[i][j] = willLive;
 		}
 	}
 }
@@ -233,8 +229,7 @@ function drawState()
 	{
 		for( j = 0; j < gridSize; j++ )
 		{
-			currentItem = getCell( i, j );
-			if( currentItem.alive ){
+			if( cells[i][j] ){
 				$( '#' + i + '-' + j ).addClass('on');
 				liveCells++;
 			}
@@ -250,19 +245,19 @@ function setItemsAlive( a_items )
 {
 	for( i in a_items ){
 		currentItem = a_items[i];
-		cells[ currentItem[0] + parseInt(gridSize/2) ][ currentItem[1] + parseInt(gridSize/2) ].alive = true;
+		cells[ currentItem[0] + parseInt(gridSize/2) ][ currentItem[1] + parseInt(gridSize/2) ] = true;
 	}
 }
 
 // updates a short string with generation and cell counter
-function updateDashboard( a_generation, a_count )
+function updateDashboard( a_generation, a_count, a_time )
 {
 	if( !a_count ){
 		alert('All cells have died. Game over!');
 		toggleGame(false);
 	}
 
-	$('.dashboard').text('Generation: '+a_generation+'; Cells: '+a_count);
+	$('.dashboard').text('Generation: '+a_generation+'; Cells: '+a_count+'; Time: '+a_time);
 }
 
 // takes the selected options from the configuration and applies them to the game
@@ -306,8 +301,7 @@ function toggleCellAlive ( a_x, a_y )
 	var targetCell;
 
 	$('#' + a_x + '-' + a_y).toggleClass('on');
-	targetCell = getCell( a_x, a_y );
-	targetCell.alive = !targetCell.alive;
+	cells[a_x][a_y] = !cells[a_x][a_y];
 }
 
 // binds a click delegate to the whole stage.
