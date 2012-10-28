@@ -103,7 +103,7 @@ function setStage()
 				className += ' first';
 			}
 
-			htmlContent += '<li class="' + className + '" title="[' + i + ':' + j + ']"></li>';
+			htmlContent += '<li id="'+i+'-'+j+'" class="' + className + '" title="[' + i + ':' + j + ']"></li>';
 			
 			itemObject = {
 				x		 : i,
@@ -229,7 +229,7 @@ function drawState()
 		{
 			currentItem = getCell( i, j );
 			if( currentItem.alive ){
-				$( '.item-' + i + '-' + j ).addClass('on');
+				$( '#' + i + '-' + j ).addClass('on');
 				liveCells++;
 			}
 		}
@@ -294,8 +294,36 @@ function populateConfigurationPanel ()
 	$('#cellFormation').html( cellFormationOptions );
 }
 
+function toggleCellAlive ( a_x, a_y ) 
+{
+	var targetCell;
+
+	$('#' + a_x + '-' + a_y).toggleClass('on');
+	targetCell = getCell( a_x, a_y );
+	targetCell.alive = !targetCell.alive;
+}
+
+function bindCellClickHandler () 
+{
+	var target, 
+		targetCoordinates, 
+		targetX, 
+		targetY;
+	
+	$('.stage').click(function(e){
+		target = $(e.target);
+		if( target.is('li') ){
+			targetCoordinates = target.attr('id').split('-');
+			targetX = parseInt(targetCoordinates[0]);
+			targetY = parseInt(targetCoordinates[1]);
+			toggleCellAlive( targetX, targetY );
+		}
+	});
+}
+
 $(document).ready(function()
 {
 	populateConfigurationPanel();
 	applyConfiguration();
+	bindCellClickHandler();
 });
