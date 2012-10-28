@@ -38,7 +38,7 @@ var cellFormations = {
 // this is the heartbeat; the clock that makes it all work
 function tick()
 {
-	// stop the ticker and this function
+	// stop the ticker and the execution of this tick if handbrake is on
 	if( handbrake ){
 		clearInterval( ticker );
 		return;
@@ -48,6 +48,7 @@ function tick()
 	cells = nextGenerationCells;	// replace current cells with new ones
 	liveCellsCount = drawState();	// draw new generation on stage
 
+	// display text feedback
 	generation++;
 	updateDashboard( generation, liveCellsCount );
 }
@@ -98,12 +99,13 @@ function setStage()
 		cells[i] = [];
 		for( j = 0; j < gridSize; j++ )
 		{
-			className = 'item-' + i + '-' + j;
+			className = '';
 			if( j == 0 ){
+				// force this row of cells to wrap to a new line
 				className += ' first';
 			}
 
-			htmlContent += '<li id="'+i+'-'+j+'" class="' + className + '" title="[' + i + ':' + j + ']"></li>';
+			htmlContent += '<li id="' + i + '-' + j + '" class="' + className + '" title="[' + i + ':' + j + ']"></li>';
 			
 			itemObject = {
 				x		 : i,
@@ -142,7 +144,8 @@ function countLiveNeighbours( a_x, a_y )
 		liveNeighbours = 0,
 		i;
 
-	// if at edges of the stage
+	// if at edges of the stage use the cells at the other side as neighbours
+	// this way we make the live cells "teleport" through the edges
 	if( xMin == -1 ){
 		xMin = gridSize - 1;
 	}
@@ -188,6 +191,7 @@ function calculateNextGeneration()
 		newObject,
 		i, j;
 	
+	// empty the nextgen array
 	nextGenerationCells = [];
 
 	for( i = 0; i < gridSize; i++ )
@@ -198,6 +202,7 @@ function calculateNextGeneration()
 			oldObject = getCell( i, j );
 			neighbours = countLiveNeighbours( i, j ) >> 0;
 
+			// survial logic for live and dead cells
 			if( oldObject.alive ){
 				willLive = ( neighbours == 2 || neighbours == 3 ) ? true : false;
 			} else {
@@ -215,6 +220,7 @@ function calculateNextGeneration()
 }
 
 // uses the cells array to "draw" living cells on the stage
+// returns the number of live cells so it can be displayed in the dashboard
 function drawState()
 {
 	var currentItem,
@@ -294,6 +300,7 @@ function populateConfigurationPanel ()
 	$('#cellFormation').html( cellFormationOptions );
 }
 
+// toggles a cell alive or dead both in the cells array and the HTML stage
 function toggleCellAlive ( a_x, a_y ) 
 {
 	var targetCell;
@@ -303,6 +310,8 @@ function toggleCellAlive ( a_x, a_y )
 	targetCell.alive = !targetCell.alive;
 }
 
+// binds a click delegate to the whole stage.
+// when clicking on a cell it figures out the cell coordinates and launches toggleCellAlive
 function bindCellClickHandler () 
 {
 	var target, 
