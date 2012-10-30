@@ -4,8 +4,9 @@ var ticker,
 	speed,
 	cells,
 	nextGenerationCells,
-	generation,
-	gridSize = 40;
+	h = [],
+	generation = 0,
+	gridSize   = 40;
 
 // possible speed levels
 var gameSpeeds = {
@@ -43,20 +44,18 @@ function tick()
 		clearInterval( ticker );
 		return;
 	}
-
 	
-	calculateNextGeneration();		// get next generation cells
 	var t1 = new Date();
+	calculateNextGeneration();		// get next generation cells
 	cells = nextGenerationCells;	// replace current cells with new ones
 	liveCellsCount = drawState();	// draw new generation on stage
 
 	var t2 = new Date();
 	var elapsed = t2 - t1;
-
+	h.push(elapsed);
 	// display text feedback
 	generation++;
 	updateDashboard( generation, liveCellsCount, elapsed );
-
 }
 
 // initializes the ticker and starts the game
@@ -126,13 +125,6 @@ function getCell( a_x, a_y )
 {
 	return cells[ a_x ][ a_y ];
 }
-
-// returns true or false for a given cell
-/*function isAlive( a_x, a_y )
-{
-	var item = getCell( a_x, a_y );
-	return item;
-}*/
 
 // loops over a cell's neighbours and returns how many of them are alive
 function countLiveNeighbours( a_x, a_y )
@@ -210,6 +202,13 @@ function calculateNextGeneration()
 				willLive = ( neighbours == 3 ) ? true : false;
 			}
 
+			/* This optimisation does not affect performance ...
+			willLive = false;
+			if( neighbours > 1 && neighbours < 4 ){
+			//if( neighbours == 2 || neighbours == 3 ){
+				willLive = ( oldCell || neighbours == 3 ) ? true : false;
+			}*/
+
 			nextGenerationCells[i][j] = willLive;
 		}
 	}
@@ -256,6 +255,17 @@ function updateDashboard( a_generation, a_count, a_time )
 		alert('All cells have died. Game over!');
 		toggleGame(false);
 	}
+
+	/* // benchmarking
+	if( a_generation == 100 ){
+		var sum = 0,i = 0;
+		for( i in h ){
+			sum += h[i];
+		}
+
+		console.log(sum/h.length);
+		toggleGame(false);
+	}//*/
 
 	$('.dashboard').text('Generation: '+a_generation+'; Cells: '+a_count+'; Time: '+a_time);
 }
