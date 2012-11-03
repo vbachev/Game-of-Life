@@ -58,74 +58,6 @@ function tick()
 	updateDashboard( generation, liveCellsCount, elapsed );
 }
 
-// initializes the ticker and starts the game
-function startTicker()
-{
-	clearInterval( ticker );
-	handbrake = false;
-	ticker = setInterval( 'tick();', speed );
-}
-
-// stops the game by putting a handbrake which will disable the ticker on its next iteration
-function stopTicker()
-{
-	handbrake = true;
-}
-
-// toggles the game on or off
-function toggleGame ( a_state )
-{
-	if( a_state === undefined ){
-		var a_state = handbrake;
-	}
-
-	if( a_state ){
-		startTicker();
-		$('#toggleGame').text('Pause');
-		$('.dashboard').addClass('running');
-	} else {
-		stopTicker();
-		$('#toggleGame').text('Start');
-		$('.dashboard').removeClass('running');
-	}
-}
-
-// initially creates the stage HTML and cells array
-function setStage()
-{
-	var htmlContent = '<ul>', 
-		i, 
-		j, 
-		className;
-
-	cells = [];
-	for( i = 0; i < gridSize; i++ )
-	{
-		cells[i] = [];
-		for( j = 0; j < gridSize; j++ )
-		{
-			className = '';
-			if( j == 0 ){
-				// force this row of cells to wrap to a new line
-				className += ' first';
-			}
-
-			htmlContent += '<li id="' + i + '-' + j + '" class="' + className + '" title="[' + i + ':' + j + ']"></li>';
-			
-			cells[i][j] = false;
-		}
-	}
-
-	htmlContent += '</ul>';
-	$('.stage').html( htmlContent );
-}
-
-// returns a cell object
-function getCell( a_x, a_y )
-{
-	return cells[ a_x ][ a_y ];
-}
-
 // loops over a cell's neighbours and returns how many of them are alive
 function countLiveNeighbours( a_x, a_y )
 {
@@ -212,6 +144,74 @@ function calculateNextGeneration()
 			nextGenerationCells[i][j] = willLive;
 		}
 	}
+}
+
+// returns a cell object
+function getCell( a_x, a_y )
+{
+	return cells[ a_x ][ a_y ];
+}
+
+// initializes the ticker and starts the game
+function startTicker()
+{
+	clearInterval( ticker );
+	handbrake = false;
+	ticker = setInterval( 'tick();', speed );
+}
+
+// stops the game by putting a handbrake which will disable the ticker on its next iteration
+function stopTicker()
+{
+	handbrake = true;
+}
+
+// toggles the game on or off
+function toggleGame ( a_state )
+{
+	if( a_state === undefined ){
+		var a_state = handbrake;
+	}
+
+	if( a_state ){
+		startTicker();
+		$('#toggleGame').text('Pause');
+		$('.dashboard').addClass('running');
+	} else {
+		stopTicker();
+		$('#toggleGame').text('Start');
+		$('.dashboard').removeClass('running');
+	}
+}
+
+// initially creates the stage HTML and cells array
+function setStage()
+{
+	var htmlContent = '<ul>', 
+		i, 
+		j, 
+		className;
+
+	cells = [];
+	for( i = 0; i < gridSize; i++ )
+	{
+		cells[i] = [];
+		for( j = 0; j < gridSize; j++ )
+		{
+			className = '';
+			if( j == 0 ){
+				// force this row of cells to wrap to a new line
+				className += ' first';
+			}
+
+			htmlContent += '<li id="' + i + '-' + j + '" class="' + className + '" title="[' + i + ':' + j + ']"></li>';
+			
+			cells[i][j] = false;
+		}
+	}
+
+	htmlContent += '</ul>';
+	$('.stage').html( htmlContent );
 }
 
 // uses the cells array to "draw" living cells on the stage
@@ -340,3 +340,118 @@ $(document).ready(function()
 	applyConfiguration();
 	bindCellClickHandler();
 });
+
+
+
+/*
+
+
+hold initial cells in an {x,y} array
+loop live cells in a 3x3 map ( neighbour)
+
+
+global = {
+  parsedCellsMap,
+  cellMap,
+  cellGeneration
+}
+
+function tick()
+{
+  var newGen = getNewGeneration( global.cellGeneration );
+  drawCells( newGen );
+
+  global.cellGeneration = newGen;
+  createCellMap( newGen );
+}
+
+function drawCells( a_gen )
+{
+  var selectors, 
+  cell, 
+  i;
+  
+  for( i in a_gen ){
+    cell = a_gen[i];
+    selectors += '#'+cell.x+'-'+cell.y+', ';
+  }
+  selectors.substr( 0, selectors.length - 2 );
+
+  $('li.alive').removeClass('alive');
+  $(selectors).addClass('alive');
+}
+
+function getNewGeneration( a_gen )
+{
+  var newGen = [], 
+  i, 
+  cellMap, 
+  cell, 
+  cellBlock, 
+  newCells;
+
+  // clear the parsed cells map
+  resetParsedCellsMap();
+
+  // loop through live cells, get cell chunks and parse them, add results
+  for( i in a_gen ){
+    cell 			= a_gen[i];
+    cellBlock = getNeighbourhood( cell.x, cell.y );
+    newCells  = parseCellBlock( cellBlock );
+    newGen 		= newGen.concat( newCells );
+  }
+
+  return newGen;
+}
+
+function getNeighbourhood( a_x, a_y )
+{
+  var result = [];
+  // TODO
+} 
+
+function runLifeConditions(){}
+
+function parseCellBlock( a_cellBlock )
+{
+  var result = [], 
+  i, 
+  cell, 
+  cellNeighbours, 
+  liveNeighbours, 
+  willLive, 
+  parsedCellsMap = global.parsedCellsMap;
+
+  for( i in a_cellBlock ){
+    cell = a_cellBlock[i];
+
+    if( parsedCellsMap[ cell.x ][ cell.y ] ){
+      continue;
+    }
+    parsedCellsMap[ cell.x ][ cell.y ] = true;
+
+    cellNeighbours = getNeighbourhood( cell.x, cell.y );
+    liveNeighbours = getLiveNeighbours( cellNeighbours );
+    willLive       = runLifeConditions( liveNeighbours );
+
+    if( willLive ){
+      result.push({ x : cell.x, y : cell.y });
+    }
+  }
+
+  global.parsedCellsMap = parsedCellsMap;
+  return result;
+}
+
+function getLiveNeighbours( a_cells ){
+  var i, cell, result = 0, cellMap = globalCelMap;
+  for( i in a_cells ){
+    cell = a_cells[i];
+    if( cellMap[ cell.x ][ cell.y ] ){
+      result++;
+    }
+  }
+  return result;
+}
+
+ */
