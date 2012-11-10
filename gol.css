@@ -49,7 +49,7 @@ body{
 .stage li.first{
 	clear: left;
 }
-.stage li.on{
+.stage li.alive{
 	background: #6a0;
 	-webkit-transition: background 0s;
 	transition: background 0s;
