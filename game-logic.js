@@ -46,7 +46,7 @@ var game = {
 
     for( i in liveCells ){
       cell = liveCells[i];
-      if( cell[0] == a_x && cell[y] == a_y ){
+      if( cell[0] == a_x && cell[1] == a_y ){
         liveCellFound = true;
         this.cellGeneration.splice( i, 1 ); // remove from array
       }

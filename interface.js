@@ -1,8 +1,8 @@
 // global variables
 var ticker,
-  handbrake,
-  speed,
-  generation = 0;
+    handbrake = true,
+    speed,
+    generation = 0;
 
 // possible speed levels
 var gameSpeeds = {
@@ -41,15 +41,17 @@ function tick()
     return;
   }
   
-  var t1 = new Date();
-  console.time('calc');
-  cells = game.getNewGeneration();    // get next generation cells
+  var t1 = new Date(),
+  t2, elapsed,
+  liveCellsCount;
+  
+  // get next generation cells and draw
+  cells = game.getNewGeneration();
   drawState( cells );
-  console.timeEnd('calc');
   liveCellsCount = cells.length;
 
-  var t2 = new Date();
-  var elapsed = t2 - t1;
+  t2 = new Date();
+  elapsed = t2 - t1;
 
   // display text feedback
   generation++;
@@ -91,7 +93,7 @@ function toggleGame ( a_state )
 // initially creates the stage HTML and cells array
 function setStage()
 {
-  var htmlContent = '<ul>', 
+  var htmlContent = [], 
     i, 
     j, 
     className,
@@ -108,19 +110,18 @@ function setStage()
         className += ' first';
       }
 
-      htmlContent += '<li id="' + i + '-' + j + '" class="' + className + '" title="[' + i + ':' + j + ']"></li>';
+      htmlContent.push('<li id="' + i + '-' + j + '" class="' + className + '" title="[' + i + ':' + j + ']"></li>');
     }
   }
 
-  htmlContent += '</ul>';
-  $('.stage').html( htmlContent );
+  $('.stage').html( '<ul>' + htmlContent.join('') + '</ul>');
 }
 
 // uses the cells array to "draw" living cells on the stage
 // returns the number of live cells so it can be displayed in the dashboard
 function drawState( a_gen )
 {
-  var selectorz = '', 
+  var selector = '', 
   cell, 
   i;
   
@@ -180,19 +181,20 @@ function applyConfiguration ()
 // uses the formation and speed objects to populate options in the configuration panel
 function populateConfigurationPanel ()
 {
-  var cellFormationOptions = '',
-    gameSpeedOptions = '';
+  var cellFormationOptions = [],
+    gameSpeedOptions = [],
+    key;
 
   for( key in cellFormations ){
-    cellFormationOptions += '<option value="'+key+'">'+cellFormations[key].name+'</option>';
+    cellFormationOptions.push('<option value="'+key+'">'+cellFormations[key].name+'</option>');
   }
 
   for( key in gameSpeeds ){
-    gameSpeedOptions += '<option value="'+key+'">'+gameSpeeds[key].name+'</option>';
+    gameSpeedOptions.push('<option value="'+key+'">'+gameSpeeds[key].name+'</option>');
   }
 
-  $('#gameSpeed').html( gameSpeedOptions );
-  $('#cellFormation').html( cellFormationOptions );
+  $('#gameSpeed').html( gameSpeedOptions.join('') );
+  $('#cellFormation').html( cellFormationOptions.join('') );
 }
 
 // toggles a cell alive or dead both in the cells array and the HTML stage
@@ -207,9 +209,9 @@ function activateCell ( a_x, a_y )
 function bindCellClickHandler () 
 {
   var target, 
-    targetCoordinates, 
-    targetX, 
-    targetY;
+      targetCoordinates, 
+      targetX, 
+      targetY;
   
   $('.stage').click(function(e){
     target = $(e.target);
