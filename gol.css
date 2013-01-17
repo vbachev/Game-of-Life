@@ -16,6 +16,7 @@ body{
 }
 
 .stageWrapper{
+  position: relative;
 	float: left;
 	width: 65%;
 	margin-left: 5%;
@@ -53,4 +54,10 @@ body{
 	background: #6a0;
 	-webkit-transition: background 0s;
 	transition: background 0s;
+}
+
+.shadowMachine{
+  position: absolute;
+  top: 15px;
+  left: 5px;
 }

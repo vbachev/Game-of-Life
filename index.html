@@ -7,9 +7,19 @@
 	
 	<link rel="stylesheet" href="gol.css">
 
-	<script src="jquery.js"></script>
-	<script src="game-logic.js"></script>
-	<script src="interface.js"></script>
+	<script type="text/javascript" src="jquery.js"></script>
+	<script type="text/javascript" src="game-logic.js"></script>
+	<script type="text/javascript" src="interface.js"></script>
+  
+  <script type="text/javascript">
+    $(document).ready(function()
+    {
+      Game.initialize();
+      populateConfigurationPanel();
+      applyConfiguration();
+      bindCellClickHandler();
+    });
+  </script>
 
 </head>
 <body>
@@ -39,6 +49,7 @@
 
 		<div class="stageWrapper">
 			<div class="stage"></div>
+      <div id="bsm" class="shadowMachine"></div>
 		</div>
 	</div>
 </body>

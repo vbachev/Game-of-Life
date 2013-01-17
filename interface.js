@@ -43,10 +43,11 @@ function tick()
   
   var t1 = new Date(),
   t2, elapsed,
+  cells,
   liveCellsCount;
   
   // get next generation cells and draw
-  cells = game.getNewGeneration();
+  cells = Game.getNewGeneration();
   drawState( cells );
   liveCellsCount = cells.length;
 
@@ -94,11 +95,10 @@ function toggleGame ( a_state )
 function setStage()
 {
   var htmlContent = [], 
-    i, 
-    j, 
+    i, j, 
     className,
-    width = game.stage.width,
-    height = game.stage.height;
+    width = Game.stage.width,
+    height = Game.stage.height;
 
   for( i = 0; i < width; i++ )
   {
@@ -118,36 +118,18 @@ function setStage()
 }
 
 // uses the cells array to "draw" living cells on the stage
-// returns the number of live cells so it can be displayed in the dashboard
 function drawState( a_gen )
 {
-  var selector = '', 
-  cell, 
-  i;
-  
-  $('li.alive').removeClass('alive');
-  for( i in a_gen ){
-    cell = a_gen[i];
-    selector = '#'+cell[0]+'-'+cell[1];
-    $(selector).addClass('alive');
-  }
-
-  /*
-  
-  var selectors = '', 
+  var shadows = [], 
   cell, 
   i;
   
   for( i in a_gen ){
     cell = a_gen[i];
-    selectors += '#'+cell[0]+'-'+cell[1]+', ';
+    shadows.push( (cell[1]*10)+'px '+(cell[0]*10)+'px 0 4px rgba(0,150,0,.75)');
   }
-  selectors = selectors.substr( 0, selectors.length - 2 );
 
-  $('li.alive').removeClass('alive');
-  $(selectors).addClass('alive');
-
-   */
+  $('#bsm').css('box-shadow', shadows.join(', '));
 }
 
 // updates a short string with generation and cell counter
@@ -174,8 +156,8 @@ function applyConfiguration ()
   generation = 0;
 
   setStage();
-  game.setGeneration( cellFormation );
-  drawState( game.cellGeneration );
+  Game.setGeneration( cellFormation );
+  drawState( Game.cellGeneration );
 }
 
 // uses the formation and speed objects to populate options in the configuration panel
@@ -201,7 +183,7 @@ function populateConfigurationPanel ()
 function activateCell ( a_x, a_y ) 
 {
   $('#' + a_x + '-' + a_y).toggleClass('on');
-  game.toggleCellAlive( a_x, a_y );
+  Game.toggleCellAlive( a_x, a_y );
 }
 
 // binds a click delegate to the whole stage.
@@ -223,11 +205,3 @@ function bindCellClickHandler ()
     }
   });
 }
-
-$(document).ready(function()
-{
-  game.initialize();
-  populateConfigurationPanel();
-  applyConfiguration();
-  bindCellClickHandler();
-});

@@ -1,4 +1,4 @@
-var game = {
+var Game = {
   parsedCellsMap : [],
   cellMap        : [],
   cellGeneration : [],
