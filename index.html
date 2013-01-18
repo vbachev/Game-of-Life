@@ -10,47 +10,43 @@
 	<script type="text/javascript" src="jquery.js"></script>
 	<script type="text/javascript" src="game-logic.js"></script>
 	<script type="text/javascript" src="interface.js"></script>
+
+</head>
+<body>
+ 
+  <fieldset class="configuration">
+    <legend>Configuration</legend>
+
+    <div>
+      <label for="gameSpeed">Game speed:</label>
+      <br>
+      <select name="gameSpeed" id="gameSpeed"></select>
+    </div>
+
+    <div>
+      <label for="cellFormation">Cell formation:</label>
+      <br>
+      <select name="cellFormation" id="cellFormation"></select>
+    </div>
+
+    <button onclick="Interface.applyConfiguration();">Apply &amp; Reset</button>
+    <button onclick="Interface.toggleGame();" id="toggleGame">Start</button>
+
+    <label class="dashboard"></label>
+  </fieldset>
+
+  <div class="stage">
+    <div class="projector"><!-- projects shadows --></div>
+  </div>
   
   <script type="text/javascript">
     $(document).ready(function()
     {
-      Game.initialize();
-      populateConfigurationPanel();
-      applyConfiguration();
-      bindCellClickHandler();
+      
+      Game.initialize( 100, 100, 6 );
+      Interface.initialize();
     });
   </script>
-
-</head>
-<body>
-	<div class="wrapper">
-		<h1>My Game Of Life</h1>
-
-		<fieldset class="configuration">
-			<legend>Configuration</legend>
-
-			<div>
-				<label for="gameSpeed">Game speed:</label>
-				<br>
-				<select name="gameSpeed" id="gameSpeed"></select>
-			</div>
-
-			<div>
-				<label for="cellFormation">Cell formation:</label>
-				<br>
-				<select name="cellFormation" id="cellFormation"></select>
-			</div>
-
-			<button onclick="applyConfiguration();">Apply &amp; Reset</button>
-			<button onclick="toggleGame();" id="toggleGame">Start</button>
-
-			<label class="dashboard"></label>
-		</fieldset>
-
-		<div class="stageWrapper">
-			<div class="stage"></div>
-      <div id="bsm" class="shadowMachine"></div>
-		</div>
-	</div>
+  
 </body>
 </html>

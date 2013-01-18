@@ -4,18 +4,23 @@ var Game = {
   cellGeneration : [],
   stage          : {
     width  : 50,
-    height : 50
+    height : 50,
+    cell   : 10
   },
 
-  initialize : function ()
+  initialize : function ( a_width, a_height, a_cell )
   {
     console.log('game initialized');
+    if( a_width && a_height ){
+      this.setStage( a_width, a_height );
+    }
+    this.stage.cell = a_cell || this.stage.cell;
   },
 
   setStage : function( a_width, a_height ) 
   {
-    this.stage.width  = parseInt( a_width );
-    this.stage.height = parseInt( a_height );
+    this.stage.width  = parseInt( a_width, 10 );
+    this.stage.height = parseInt( a_height, 10 );
   },
 
   // takes an array of cell coordinates ant turns them alive.
@@ -23,8 +28,8 @@ var Game = {
   setGeneration : function ( a_cells )
   {
     var
-    midX = parseInt(this.stage.width/2),
-    midY = parseInt(this.stage.height/2);
+    midX = parseInt( this.stage.width/2, 10 ),
+    midY = parseInt( this.stage.height/2, 10 );
 
     this.cellGeneration = [];
 
