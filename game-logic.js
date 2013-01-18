@@ -8,16 +8,16 @@ var Game = {
     cell   : 10
   },
 
-  initialize : function ( a_width, a_height, a_cell )
+  initialize : function initialize( a_width, a_height, a_cell )
   {
-    console.log('game initialized');
+    debug('game initialized');
     if( a_width && a_height ){
       this.setStage( a_width, a_height );
     }
     this.stage.cell = a_cell || this.stage.cell;
   },
 
-  setStage : function( a_width, a_height ) 
+  setStage : function setStage( a_width, a_height ) 
   {
     this.stage.width  = parseInt( a_width, 10 );
     this.stage.height = parseInt( a_height, 10 );
@@ -25,9 +25,9 @@ var Game = {
 
   // takes an array of cell coordinates ant turns them alive.
   // used to display a preset cell pattern
-  setGeneration : function ( a_cells )
+  setGeneration : function setGeneration( a_cells )
   {
-    var
+    var currentItem, i,
     midX = parseInt( this.stage.width/2, 10 ),
     midY = parseInt( this.stage.height/2, 10 );
 
@@ -42,33 +42,36 @@ var Game = {
     }
 
     this.createCellMap();
+    debug('manually set cell generation configuration');
   },
 
-  toggleCellAlive : function( a_x, a_y )
+  toggleCellAlive : function toggleCellAlive( a_x, a_y )
   {
-    var liveCellFound = false
-    liveCells = this.cellGeneration;
+    var liveCellFound = false,
+    liveCells = this.cellGeneration,
+    i, cell;
 
     for( i in liveCells ){
       cell = liveCells[i];
       if( cell[0] == a_x && cell[1] == a_y ){
         liveCellFound = true;
         this.cellGeneration.splice( i, 1 ); // remove from array
+        debug('manually killed cell '+a_x+':'+a_y);
       }
     }
 
     if( !liveCellFound ){
       this.cellGeneration.push([ a_x, a_y ]);
+      debug('manually revived cell '+a_x+':'+a_y);
     }
 
     this.createCellMap();
   },
 
-  getNewGeneration : function ( a_gen )
+  getNewGeneration : function getNewGeneration( a_gen )
   {
     var newGen = [], 
-    i, 
-    cellMap, 
+    i,
     cell, 
     cellBlock, 
     newCells;
@@ -94,7 +97,7 @@ var Game = {
     return newGen;
   },
 
-  getNeighbourhood : function ( a_x, a_y, a_include )
+  getNeighbourhood : function getNeighbourhood( a_x, a_y, a_include )
   {
       var stage = this.stage,
       xMin = a_x - 1,
@@ -102,7 +105,6 @@ var Game = {
       yMin = a_y - 1,
       yMax = a_y + 1,
       neighbours     = [],
-      liveNeighbours = 0,
       i;
 
     // if at edges of the stage use the cells at the other side as neighbours
@@ -139,17 +141,20 @@ var Game = {
     return neighbours;
   },
 
-  runLifeConditions : function ( a_currentlyAlive, a_liveNeighbours )
+  runLifeConditions : function runLifeConditions( a_currentlyAlive, a_liveNeighbours )
   {
+    var willLive = false;
+    
     if( a_currentlyAlive ){
       willLive = ( a_liveNeighbours == 2 || a_liveNeighbours == 3 ) ? true : false;
     } else {
       willLive = ( a_liveNeighbours == 3 ) ? true : false;
     }
+    
     return willLive;
   },
 
-  parseCellBlock : function ( a_cellBlock )
+  parseCellBlock : function parseCellBlock( a_cellBlock )
   {
     var result = [], 
     i, 
@@ -157,6 +162,7 @@ var Game = {
     cellNeighbours, 
     liveNeighbours, 
     cellWillLive, 
+    cellIsAlive,
     parsedCellsMap = this.parsedCellsMap;
 
     for( i in a_cellBlock ){
@@ -187,7 +193,8 @@ var Game = {
     return result;
   },
 
-  getLiveNeighbours : function( a_neighbours ){
+  getLiveNeighbours : function getLiveNeighbours( a_neighbours )
+  {
     var i, 
     cell, 
     result  = 0, 
@@ -202,7 +209,7 @@ var Game = {
     return result;
   },
 
-  resetParsedCellsMap : function()
+  resetParsedCellsMap : function resetParsedCellsMap()
   {
     var i, 
     j,
@@ -220,20 +227,24 @@ var Game = {
     this.parsedCellsMap = map;
   },
 
-  createCellMap : function ()
+  createCellMap : function createCellMap()
   {
     var cellMap = [],
     width  = this.stage.width,
     height = this.stage.height,
-    liveCellCount = this.cellGeneration.length;
+    liveCellCount = this.cellGeneration.length,
+    liveCell,
+    i, j;
 
+    // create a map with false values
     for( i = 0; i < width; i++ ){
       cellMap[i] = [];
       for( j = 0; j < height; j++ ){
         cellMap[i][j] = false;
       }
     }
-
+    
+    // turn the ones that represent a live cell to true
     for( i = 0; i < liveCellCount; i++ ){
       liveCell = this.cellGeneration[i];
       cellMap[ liveCell[0] ][ liveCell[1] ] = true;

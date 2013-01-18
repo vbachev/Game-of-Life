@@ -40,12 +40,31 @@
   </div>
   
   <script type="text/javascript">
-    $(document).ready(function()
-    {
-      
-      Game.initialize( 100, 100, 6 );
+    $(document).ready(function(){
+      Game.initialize( 100, 50, 10 );
       Interface.initialize();
     });
+    
+    // tiny debug logger
+    function debug( a_msg ){
+      var info = {
+        source : arguments.callee.caller.name,
+        args : arguments.callee.caller.arguments
+      },
+      entry = { message : a_msg, details : info, time : new Date() };
+      
+      // record entries
+      if( typeof debug.log === 'object' ){
+        debug.log.push(entry);
+      } else {
+        debug.log = [entry];
+      }
+      
+      // if requested show debug messages
+      if( Interface.debug ){
+        console.log( entry.message, entry.details, entry.time.toLocaleString() );
+      }
+    }
   </script>
   
 </body>

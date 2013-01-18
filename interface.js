@@ -1,4 +1,5 @@
 var Interface = {
+  debug : true,
   
   ticker : '',
   handbrake : true,
@@ -33,8 +34,9 @@ var Interface = {
     }
   },
   
-  initialize : function()
+  initialize : function initialize()
   {
+    debug('interface initialized');
     this.populateConfigurationPanel();
     this.applyConfiguration();
     this.bindCellClickHandler();
@@ -70,6 +72,7 @@ var Interface = {
   // initializes the ticker and starts the game
   startTicker : function startTicker()
   {
+    debug('game started');
     clearInterval( this.ticker );
     this.handbrake = false;
     this.ticker = setInterval( 'Interface.tick();', this.speed );
@@ -78,6 +81,7 @@ var Interface = {
   // stops the game by putting a handbrake which will disable the ticker on its next iteration
   stopTicker : function stopTicker()
   {
+    debug('game stopped');
     this.handbrake = true;
   },
 
@@ -102,6 +106,7 @@ var Interface = {
   // initially creates the stage HTML and cells array
   setStage : function setStage()
   {
+    debug('stage created');
     var stageWidth = Game.stage.width,
       stageHeight = Game.stage.height,
       cellSize = Game.stage.cell,
@@ -140,8 +145,8 @@ var Interface = {
     for( i in a_gen ){
       cell = a_gen[i];
       shadows.push( 
-        (cell[1]*(cellSize+1)+(Math.floor(cellSize/2)+1))+'px '+
-        (cell[0]*(cellSize+1)+(Math.floor(cellSize/2)+1))+'px 0 '+
+        (cell[0]*(cellSize+1)+(Math.floor(cellSize/2)+1))+'px '+
+        (cell[1]*(cellSize+1)+(Math.floor(cellSize/2)+1))+'px 0 '+
         (Math.floor(cellSize/2))+'px rgba(0,150,50,.6)'
       );
     }
@@ -154,7 +159,7 @@ var Interface = {
   updateDashboard : function updateDashboard( a_generation, a_count, a_time )
   {
     if( !a_count ){
-      alert('All cells have died. Game over!');
+      debug('All cells have died. Game over!');
       this.toggleGame(false);
     }
 
@@ -181,6 +186,7 @@ var Interface = {
   // uses the formation and speed objects to populate options in the configuration panel
   populateConfigurationPanel : function populateConfigurationPanel ()
   {
+    debug('configuration panel created');
     var cellFormationOptions = [],
       gameSpeedOptions = [],
       key;
@@ -200,27 +206,23 @@ var Interface = {
   // toggles a cell alive or dead both in the cells array and the HTML stage
   activateCell : function activateCell ( a_x, a_y ) 
   {
-    $('#' + a_x + '-' + a_y).toggleClass('on');
     Game.toggleCellAlive( a_x, a_y );
+    this.drawState( Game.cellGeneration );
   },
 
   // binds a click delegate to the whole stage.
   // when clicking on a cell it figures out the cell coordinates and launches toggleCellAlive
   bindCellClickHandler : function bindCellClickHandler () 
   {
-    var target, 
-        targetCoordinates, 
-        targetX, 
+    var targetX, 
         targetY;
 
-    $('.stage').click(function(e){console.log(e);
-      target = $(e.target);
-      if( target.is('li') ){
-        targetCoordinates = target.attr('id').split('-');
-        targetX = parseInt( targetCoordinates[0], 10 );
-        targetY = parseInt( targetCoordinates[1], 10 );
-        
-        this.activateCell( targetX, targetY );
+    $('.stage').off('click').on('click', function(e){
+      targetX = Math.floor( (e.offsetX-1) / (Game.stage.cell+1) );
+      targetY = Math.floor( (e.offsetY-1) / (Game.stage.cell+1) );
+      
+      if( targetX >= 0 && targetY >= 0 && targetX < Game.stage.width && targetY < Game.stage.height ){
+        Interface.activateCell( targetX, targetY );
       }
     });
   }
