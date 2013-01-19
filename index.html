@@ -5,11 +5,11 @@
 	<meta charset="UTF-8">
 	<title>Game Of Life</title>
 	
-	<link rel="stylesheet" href="gol.css">
+	<link rel="stylesheet" href="css/gol.css">
 
-	<script type="text/javascript" src="jquery.js"></script>
-	<script type="text/javascript" src="game-logic.js"></script>
-	<script type="text/javascript" src="interface.js"></script>
+	<script type="text/javascript" src="lib/jquery.js"></script>
+	<script type="text/javascript" src="lib/Game.js"></script>
+	<script type="text/javascript" src="lib/Interface.js"></script>
 
 </head>
 <body>
@@ -40,11 +40,6 @@
   </div>
   
   <script type="text/javascript">
-    $(document).ready(function(){
-      Game.initialize( 100, 50, 10 );
-      Interface.initialize();
-    });
-    
     // tiny debug logger
     function debug( a_msg ){
       var info = {
@@ -65,6 +60,18 @@
         console.log( entry.message, entry.details, entry.time.toLocaleString() );
       }
     }
+
+    // initialize the whole game and pass settings
+    Interface.initialize({
+      //cellColor   : 0,
+      //cellSize    : 0,
+      //cellOffset  : 0,
+      //cellBlur    : 0,
+      //gridColor   : 0,
+      debug       : true,
+      gridX       : 100,
+      gridY       : 50
+    });
   </script>
   
 </body>

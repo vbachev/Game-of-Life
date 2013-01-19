@@ -9,6 +9,7 @@ body{
   top: 20px;
   left: 20px;
 	width: 300px;
+  background: white;
   background: rgba(255,255,255,.8);
   border: 1px solid #aaa;
   border-radius: 4px;
@@ -29,6 +30,7 @@ body{
 .stage{
   position: relative;
   margin: 20px auto;
+  background-color: #fafafa;
 }
 
 .projector{
