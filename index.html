@@ -5,11 +5,12 @@
 	<meta charset="UTF-8">
 	<title>Game Of Life</title>
 	
-	<link rel="stylesheet" href="css/gol.css">
+	<link rel="stylesheet" href="css/style.css">
 
 	<script type="text/javascript" src="lib/jquery.js"></script>
 	<script type="text/javascript" src="lib/Game.js"></script>
-	<script type="text/javascript" src="lib/Interface.js"></script>
+  <script type="text/javascript" src="lib/Interface.js"></script>
+	<script type="text/javascript" src="lib/Debug.js"></script>
 
 </head>
 <body>
@@ -40,35 +41,14 @@
   </div>
   
   <script type="text/javascript">
-    // tiny debug logger
-    function debug( a_msg ){
-      var info = {
-        source : arguments.callee.caller.name,
-        args : arguments.callee.caller.arguments
-      },
-      entry = { message : a_msg, details : info, time : new Date() };
-      
-      // record entries
-      if( typeof debug.log === 'object' ){
-        debug.log.push(entry);
-      } else {
-        debug.log = [entry];
-      }
-      
-      // if requested show debug messages
-      if( Interface.debug ){
-        console.log( entry.message, entry.details, entry.time.toLocaleString() );
-      }
-    }
-
     // initialize the whole game and pass settings
     Interface.initialize({
+      //debug       : true,
       //cellColor   : 0,
       //cellSize    : 0,
       //cellOffset  : 0,
       //cellBlur    : 0,
       //gridColor   : 0,
-      debug       : true,
       gridX       : 100,
       gridY       : 50
     });
