@@ -3,6 +3,15 @@ body{
   background: #f4f4f4;
 }
 
+fieldset{
+  border: 1px solid #aaa;
+  border-radius: 2px;
+}
+
+button, select{
+  cursor: pointer;
+}
+
 .configuration{
 	position: absolute;
   z-index: 100;
@@ -11,12 +20,17 @@ body{
 	width: 300px;
   background: white;
   background: rgba(255,255,255,.8);
-  border: 1px solid #aaa;
-  border-radius: 4px;
-  box-shadow: 4px 4px 4px rgba(0,0,0,.3);
+  box-shadow: 0 2px 4px #ccc;
 }
 .configuration div{
 	margin: 0 0 20px;
+}
+#toggleGame {
+  position: absolute;
+  z-index: 10;
+  top: 20px;
+  right: 10px;
+  padding: 15px 20px;
 }
 
 .dashboard{
@@ -30,7 +44,8 @@ body{
 .stage{
   position: relative;
   margin: 20px auto;
-  background-color: #fafafa;
+  background-color: #fff;
+  box-shadow: 0 2px 4px #ccc;
 }
 
 .projector{

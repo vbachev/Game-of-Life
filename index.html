@@ -21,16 +21,15 @@
     <div>
       <label for="gameSpeed">Game speed:</label>
       <br>
-      <select name="gameSpeed" id="gameSpeed"></select>
+      <select name="gameSpeed" id="gameSpeed" onchange="Interface.setSpeed();"></select>
     </div>
 
-    <div>
-      <label for="cellFormation">Cell formation:</label>
-      <br>
+    <fieldset>
+      <legend>Cell formation:</legend>
       <select name="cellFormation" id="cellFormation"></select>
-    </div>
+      <button onclick="Interface.applyConfiguration();">Apply &amp; Reset</button>
+    </fieldset>
 
-    <button onclick="Interface.applyConfiguration();">Apply &amp; Reset</button>
     <button onclick="Interface.toggleGame();" id="toggleGame">Start</button>
 
     <label class="dashboard"></label>
@@ -45,8 +44,8 @@
     Interface.initialize({
       //debug       : true,
       //cellColor   : 0,
-      //cellSize    : 0,
-      //cellOffset  : 0,
+      //cellSize    : 4,
+      cellOffset  : 1,
       //cellBlur    : 0,
       //gridColor   : 0,
       gridX       : 100,
